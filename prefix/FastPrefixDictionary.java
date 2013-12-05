@@ -2,7 +2,8 @@ package prefix;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class to create a hash of the String and Integer values in a dictionary
@@ -11,21 +12,33 @@ import java.util.*;
  */
 public class FastPrefixDictionary implements PrefixDictionary{
 
-	Map<String, Integer> map;
+	Map<String, Map<String, Integer>> map;
+	Map<String, Integer> map1;
 	
 	/**
 	 * Constructor to make a hash of the filename
 	 * @param fileName name of the file of which to parse into a hash
 	 */
 	public FastPrefixDictionary(String fileName){
-		map = new TreeMap<String,Integer>();
+		map = new HashMap<String,Map<String, Integer>>();
 		try {
 		    BufferedReader file = new BufferedReader(new FileReader(fileName));
 		    String line;
 		    String[] lineList;
 		    while((line = file.readLine()) != null) {
 		    	lineList = line.split(",");
-		    	map.put(lineList[0].trim(), Integer.parseInt(lineList[1].trim()));
+		    	String key = lineList[0].trim();
+		    	String first = key.substring(0, 1);
+		    	String rest = key.substring(1,key.length());
+		    	if(!map.containsKey(first)){
+		    		map1 = new HashMap<String, Integer>();
+		    		map.put(first, map1);
+		    	  	map1.put(rest, Integer.parseInt(lineList[1].trim()));
+		    	}else{
+		    		map1 = map.get(first);
+		    		map1.put(rest, Integer.parseInt(lineList[1].trim()));
+		    	}
+		    		
 		    }
 		    file.close();
 		} catch(Exception e) {
@@ -41,13 +54,15 @@ public class FastPrefixDictionary implements PrefixDictionary{
 	public long sum(String prefix) {
 		prefix = prefix.trim();
 		long sum = 0;
-		for(Map.Entry<String, Integer> entry : map.entrySet())
+		String first = prefix.substring(0, 1);
+    	String rest = prefix.substring(1,prefix.length());
+    	map1 = map.get(first);
+		for(Map.Entry<String, Integer> entry : map1.entrySet())
 		{
-			String key = entry.getKey();
-			if(key.startsWith(prefix))
-				sum += map.get(key);
+			if(entry.getKey().startsWith(rest))
+				sum += entry.getValue();
 		}
-		return sum;
+		return sum; 
 	}
 
 }
