@@ -6,13 +6,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Class to create a hash of the String and Integer values in a dictionary
+ * Class to return the sum of the dictionary values in a CSV file
  * @author Dan
- *
  */
 public class FastPrefixDictionary implements PrefixDictionary{
 
+	//HashMap of the First letters
 	Map<String, Map<String, Integer>> map;
+	//HashMap of the rest of the string
 	Map<String, Integer> map1;
 	
 	/**
@@ -20,26 +21,36 @@ public class FastPrefixDictionary implements PrefixDictionary{
 	 * @param fileName name of the file of which to parse into a hash
 	 */
 	public FastPrefixDictionary(String fileName){
+		//create the map of the first letter
 		map = new HashMap<String,Map<String, Integer>>();
 		try {
+			//read the file
 		    BufferedReader file = new BufferedReader(new FileReader(fileName));
 		    String line;
 		    String[] lineList;
+		    //while the file is not empty
 		    while((line = file.readLine()) != null) {
 		    	lineList = line.split(",");
 		    	String key = lineList[0].trim();
 		    	String first = key.substring(0, 1);
 		    	String rest = key.substring(1,key.length());
+		    	//if the letter does not exists in the map
 		    	if(!map.containsKey(first)){
+		    		//create that map
 		    		map1 = new HashMap<String, Integer>();
+		    		//add the map
 		    		map.put(first, map1);
+		    		//add the rest of it
 		    	  	map1.put(rest, Integer.parseInt(lineList[1].trim()));
 		    	}else{
+		    		//get that letters map
 		    		map1 = map.get(first);
+		    		//add the rest of it
 		    		map1.put(rest, Integer.parseInt(lineList[1].trim()));
 		    	}
 		    		
 		    }
+		    //close file
 		    file.close();
 		} catch(Exception e) {
 		    e.printStackTrace();
@@ -52,16 +63,23 @@ public class FastPrefixDictionary implements PrefixDictionary{
 	 */
 	@Override
 	public long sum(String prefix) {
+		//trim the prefix
 		prefix = prefix.trim();
 		long sum = 0;
+		//get the first letter
 		String first = prefix.substring(0, 1);
+		//get the rest of the string
     	String rest = prefix.substring(1,prefix.length());
+    	//get that first letters map
     	map1 = map.get(first);
+    	//add the rest of the prefix's numerical values
 		for(Map.Entry<String, Integer> entry : map1.entrySet())
 		{
+			//if the entry matches the rest of the prefix add it to sum
 			if(entry.getKey().startsWith(rest))
 				sum += entry.getValue();
 		}
+		//return the sum 
 		return sum; 
 	}
 
