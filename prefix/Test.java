@@ -25,7 +25,7 @@ public class Test
 	    System.out.println();
 
 	    Scanner scn = new Scanner(System.in);
-	    String prefix;
+	    String prefix; 
 	    long start, end;
 	    int naiveDelta, fastDelta;
 	    double speedup;
